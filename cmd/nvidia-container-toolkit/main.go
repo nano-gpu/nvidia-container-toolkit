@@ -81,9 +81,10 @@ func doPrestart() {
 
 	defer exit()
 	log.SetFlags(0)
-
 	hook := getHookConfig()
 	cli := hook.NvidiaContainerCLI
+
+	input := flag.Args()
 
 	container := getContainerConfig(hook)
 	nvidia := container.Nvidia
@@ -123,9 +124,15 @@ func doPrestart() {
 	if cli.NoCgroups {
 		args = append(args, "--no-cgroups")
 	}
-	if len(nvidia.Devices) > 0 {
-		args = append(args, fmt.Sprintf("--device=%s", nvidia.Devices))
+	fmt.Printf("%v", input)
+	if len(input) > 1 {
+		args = append(args, fmt.Sprintf("--device=%s", input[1]))
+	} else {
+		if len(nvidia.Devices) > 0 {
+			args = append(args, fmt.Sprintf("--device=%s", nvidia.Devices))
+		}
 	}
+
 	if len(nvidia.MigConfigDevices) > 0 {
 		args = append(args, fmt.Sprintf("--mig-config=%s", nvidia.MigConfigDevices))
 	}
@@ -148,7 +155,7 @@ func doPrestart() {
 
 	args = append(args, fmt.Sprintf("--pid=%s", strconv.FormatUint(uint64(container.Pid), 10)))
 	args = append(args, rootfs)
-
+	fmt.Println("%v", args)
 	env := append(os.Environ(), cli.Environment...)
 	err = syscall.Exec(args[0], args, env)
 	log.Panicln("exec failed:", err)
