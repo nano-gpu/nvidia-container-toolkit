@@ -14,17 +14,15 @@
 # limitations under the License.
 */
 
-package main
+package modify
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
+	"github.com/NVIDIA/nvidia-container-toolkit/internal/oci"
 )
 
-func TestConstructor(t *testing.T) {
-	shim, err := newRuntime([]string{})
+//go:generate moq -stub -out modify_mock.go . Modifier
 
-	require.NoError(t, err)
-	require.NotNil(t, shim)
+// Modifier defines an interface for modifying an OCI Specification.
+type Modifier interface {
+	Modify(oci.Spec) error
 }

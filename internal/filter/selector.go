@@ -14,17 +14,14 @@
 # limitations under the License.
 */
 
-package main
+package filter
 
-import (
-	"testing"
+import "github.com/NVIDIA/nvidia-container-toolkit/internal/discover"
 
-	"github.com/stretchr/testify/require"
-)
+//go:generate moq -stub -out selector_mock.go . Selector
 
-func TestConstructor(t *testing.T) {
-	shim, err := newRuntime([]string{})
-
-	require.NoError(t, err)
-	require.NotNil(t, shim)
+// Selector defines an interface for determining whether a specfied Device is selected
+// by a particular configuration.
+type Selector interface {
+	Selected(discover.Device) bool
 }

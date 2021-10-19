@@ -14,17 +14,9 @@
 # limitations under the License.
 */
 
-package main
+package ensure
 
-import (
-	"testing"
+import "github.com/NVIDIA/nvidia-container-toolkit/internal/discover"
 
-	"github.com/stretchr/testify/require"
-)
-
-func TestConstructor(t *testing.T) {
-	shim, err := newRuntime([]string{})
-
-	require.NoError(t, err)
-	require.NotNil(t, shim)
-}
+// Ensure is an alias for Discover
+type Ensure discover.Discover

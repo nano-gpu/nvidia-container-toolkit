@@ -14,17 +14,28 @@
 # limitations under the License.
 */
 
-package main
+package filter
 
-import (
-	"testing"
+import "github.com/NVIDIA/nvidia-container-toolkit/internal/discover"
 
-	"github.com/stretchr/testify/require"
-)
+type standardDevice struct{}
 
-func TestConstructor(t *testing.T) {
-	shim, err := newRuntime([]string{})
+// StandardDevice returns a selector for regular (non-control) devices
+func StandardDevice() Selector {
+	return &standardDevice{}
+}
 
-	require.NoError(t, err)
-	require.NotNil(t, shim)
+// Selected returns true for a standard device and false for controll devices. A regular device
+// is expected to have an index, uuid, and PCI bus ID.
+func (s standardDevice) Selected(device discover.Device) bool {
+	if device.Index == "" {
+		return false
+	}
+	if device.PCIBusID == "" {
+		return false
+	}
+	if device.UUID == "" {
+		return false
+	}
+	return true
 }

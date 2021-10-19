@@ -14,17 +14,39 @@
 # limitations under the License.
 */
 
-package main
+package filter
 
 import (
 	"testing"
 
+	"github.com/NVIDIA/nvidia-container-toolkit/internal/discover"
 	"github.com/stretchr/testify/require"
 )
 
-func TestConstructor(t *testing.T) {
-	shim, err := newRuntime([]string{})
+func TestStandardDevice(t *testing.T) {
+	standard := StandardDevice()
 
-	require.NoError(t, err)
-	require.NotNil(t, shim)
+	pcibusID := discover.PCIBusID("pcibusid")
+
+	device := discover.Device{
+		Index:    "index",
+		UUID:     "uuid",
+		PCIBusID: pcibusID,
+	}
+	require.True(t, standard.Selected(device))
+
+	require.False(t, standard.Selected(
+		discover.Device{UUID: "uuid", PCIBusID: pcibusID},
+	))
+
+	require.False(t, standard.Selected(
+		discover.Device{Index: "index", PCIBusID: pcibusID},
+	))
+
+	require.False(t, standard.Selected(
+		discover.Device{Index: "index", UUID: "uuid"},
+	))
+
+	require.False(t, standard.Selected(discover.Device{}))
+
 }

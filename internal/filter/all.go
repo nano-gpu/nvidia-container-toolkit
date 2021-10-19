@@ -14,17 +14,28 @@
 # limitations under the License.
 */
 
-package main
+package filter
 
-import (
-	"testing"
+import "github.com/NVIDIA/nvidia-container-toolkit/internal/discover"
 
-	"github.com/stretchr/testify/require"
-)
+type all struct {
+	selectors []Selector
+}
 
-func TestConstructor(t *testing.T) {
-	shim, err := newRuntime([]string{})
+// All returns a selector that evaluates true if EACH of the specified selectors
+// are selected.
+func All(selectors ...Selector) Selector {
+	s := all{
+		selectors: selectors,
+	}
+	return &s
+}
 
-	require.NoError(t, err)
-	require.NotNil(t, shim)
+func (s all) Selected(device discover.Device) bool {
+	for _, si := range s.selectors {
+		if !si.Selected(device) {
+			return false
+		}
+	}
+	return true
 }
